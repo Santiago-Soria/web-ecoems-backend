@@ -93,7 +93,7 @@ public class UsuarioController {
             Usuario usuario = usuarioEncontrado.get();
             // 2. Comparamos las contraseñas (Texto plano por la prisa del proyecto)
             if (usuario.getContrasena().equals(credenciales.getContrasena())) {
-                // ¡Éxito! Devolvemos al usuario para guardar sus datos en el front
+                // Devolvemos al usuario para guardar sus datos en el front
                 return new ResponseEntity<>(usuario, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Contraseña incorrecta", HttpStatus.UNAUTHORIZED);
