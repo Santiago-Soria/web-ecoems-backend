@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
@@ -19,7 +20,7 @@ public class UsuarioController {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
-    private CorreoService correoService; // <--- Agrega esto
+    private CorreoService correoService;
 
     // 1. Obtener todos los usuarios
     @GetMapping
@@ -80,4 +81,26 @@ public class UsuarioController {
             return new ResponseEntity<>("No se puede eliminar: El usuario tiene registros asociados (exámenes realizados).", HttpStatus.CONFLICT);
         }
     }
+
+    // 5. LOGIN (Validar credenciales)
+    // Recibe un JSON: { "correo": "juan@gmail.com", "contrasena": "12345" }
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUsuario(@RequestBody Usuario credenciales) {
+        // 1. Buscamos al usuario por correo usando el método que ya tienes en el Repo
+        Optional<Usuario> usuarioEncontrado = usuarioRepository.findByCorreo(credenciales.getCorreo());
+
+        if (usuarioEncontrado.isPresent()) {
+            Usuario usuario = usuarioEncontrado.get();
+            // 2. Comparamos las contraseñas (Texto plano por la prisa del proyecto)
+            if (usuario.getContrasena().equals(credenciales.getContrasena())) {
+                // ¡Éxito! Devolvemos al usuario para guardar sus datos en el front
+                return new ResponseEntity<>(usuario, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Contraseña incorrecta", HttpStatus.UNAUTHORIZED);
+            }
+        } else {
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        }
+    }
+
 }
