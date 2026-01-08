@@ -90,4 +90,12 @@ public class ResultadoController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(new InputStreamResource(bis));
     }
+
+    @GetMapping("/usuario/{idUsuario}/examen/{idExamen}")
+    public ResponseEntity<?> obtenerResultadoEspecifico(@PathVariable Long idUsuario, @PathVariable Long idExamen) {
+        return resultadoRepo.findFirstByUsuario_IdUsuarioAndExamen_IdExamenOrderByFechaDesc(idUsuario, idExamen)
+                .map(resultado -> new ResponseEntity<>(resultado, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND)); 
+                // Si no hay resultado, el 404 ahora será "esperado" y no un error de ruta inexistente
+    }
 }
